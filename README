@@ -1,0 +1,12 @@
+PROJECTS MEGA SERVER
+=====================
+
+END-POINTS
+==========
+
+1. CTGU-SOCIAL => /ctgu-social
+---------------
+
+    * /user             ----- GET -----     #users request
+    * /user/login       ----- POST -----    #login requests
+    * /user/register    ----- POST -----    #register request

@@ -17,7 +17,7 @@ const login = (req, res) => {
         if (users.length > 0) {
           if (password == users[0].password) {
             const user = {
-              ...user[0],
+              ...users[0],
               loggedIn: true,
             };
 

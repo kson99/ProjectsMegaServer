@@ -27,22 +27,20 @@ const login = (req, res) => {
             );
             delete user.password;
 
-            res.status(200).json({ token, user });
+            res.json({ token, user });
           } else {
-            res.status(400).json({
+            res.json({
               loggedIn: false,
               message: "! Wrong username or password",
             });
           }
         } else {
-          res
-            .status(400)
-            .json({ loggeIn: false, message: "! User doesn't exist" });
+          res.json({ loggeIn: false, message: "! User doesn't exist" });
         }
       }
     );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.json({ error: error.message });
   }
 };
 

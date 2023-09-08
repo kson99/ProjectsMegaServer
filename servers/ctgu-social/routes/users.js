@@ -1,38 +1,49 @@
 const db = require("../config/db");
+const jwt = require("jsonwebtoken");
 
 const login = (req, res) => {
   const stNumber = req.body.stNumber;
   const password = req.body.password;
 
-  db.query(
-    "SELECT * FROM Users WHERE stNumber = ?",
-    stNumber,
-    (err, results) => {
-      if (err) {
-        console.log(err);
-      }
-
-      if (results.length > 0) {
-        console.log(results);
-        if (password == results[0].password) {
-          res.json({
-            loggedIn: true,
-            stNumber: stNumber,
-            userId: results[0].userId,
-            college: results[0].college,
-            username: results[0].username,
-          });
-        } else {
-          res.json({
-            loggedIn: false,
-            message: "! Wrong username or password",
-          });
+  try {
+    db.query(
+      "SELECT * FROM Users WHERE stNumber = ?",
+      stNumber,
+      (err, users) => {
+        if (err) {
+          console.log(err.message);
         }
-      } else {
-        res.json({ loggeIn: false, message: "! User doesn't exist" });
+
+        if (users.length > 0) {
+          if (password == users[0].password) {
+            const user = {
+              ...user[0],
+              loggedIn: true,
+            };
+
+            const token = jwt.sign(
+              { id: user.userId },
+              process.env.CTGU_JWT_TOKEN
+            );
+            delete user.password;
+
+            res.status(200).json({ token, user });
+          } else {
+            res.status(400).json({
+              loggedIn: false,
+              message: "! Wrong username or password",
+            });
+          }
+        } else {
+          res
+            .status(400)
+            .json({ loggeIn: false, message: "! User doesn't exist" });
+        }
       }
-    }
-  );
+    );
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const register = (req, res) => {

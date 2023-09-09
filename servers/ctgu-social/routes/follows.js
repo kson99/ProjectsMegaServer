@@ -30,6 +30,7 @@ const getFollowers = (person, me, type) => {
     }
 
     followers = _user.followers != null && JSON.parse(_user.followers);
+
     if (type === "+") {
       followers.push(me);
     } else {
@@ -43,8 +44,6 @@ const getFollowers = (person, me, type) => {
 
 const follow = (req, res) => {
   const { me, person } = req.body;
-
-  console.log(getFollowing(me));
 
   try {
     db.query(

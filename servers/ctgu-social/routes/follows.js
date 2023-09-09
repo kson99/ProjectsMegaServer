@@ -1,28 +1,28 @@
 const db = require("../config/db");
 
 const getFollowing = (me) => {
-  let following;
+  let following = [];
 
   db.query("SELECT * FROM Users WHERE username = ?", me, (err, _user) => {
     if (err) {
       console.log(err);
     }
 
-    following = _user.following ? JSON.parse(_user.following) : [];
+    following = _user.following != null && JSON.parse(_user.following);
   });
 
   return following;
 };
 
 const getFollowers = (person) => {
-  let followers;
+  let followers = [];
 
   db.query("SELECT * FROM Users WHERE username = ?", person, (err, _user) => {
     if (err) {
       console.log(err);
     }
 
-    followers = _user.followers ? JSON.parse(_user.followers) : [];
+    followers = _user.followers != null && JSON.parse(_user.followers);
   });
 
   return followers;
@@ -30,6 +30,8 @@ const getFollowers = (person) => {
 
 const follow = (req, res) => {
   const { me, person } = req.body;
+
+  console.log(getFollowing(me));
 
   try {
     db.query(

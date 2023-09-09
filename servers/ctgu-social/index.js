@@ -34,7 +34,7 @@ router.post("/message", sendMessage);
 router.get("/message", getMessages);
 
 // Follows
-router.post("/follows", follow);
+router.post("/follow", follow);
 router.post("/unfollow", unfollow);
 
 module.exports = router;

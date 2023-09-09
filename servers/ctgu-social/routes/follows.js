@@ -1,6 +1,6 @@
 const db = require("../config/db");
 
-const getFollowing = (me, person) => {
+const getFollowing = (me, person, type) => {
   let following = [];
 
   db.query("SELECT * FROM Users WHERE username = ?", me, (err, _user) => {
@@ -9,13 +9,19 @@ const getFollowing = (me, person) => {
     }
 
     following = _user.following != null && JSON.parse(_user.following);
-    following.push(person);
+
+    if (type === "+") {
+      following.push(person);
+    } else {
+      let _following = following;
+      following = _following.filter((p) => p != person);
+    }
   });
 
   return following;
 };
 
-const getFollowers = (person, me) => {
+const getFollowers = (person, me, type) => {
   let followers = [];
 
   db.query("SELECT * FROM Users WHERE username = ?", person, (err, _user) => {
@@ -24,7 +30,12 @@ const getFollowers = (person, me) => {
     }
 
     followers = _user.followers != null && JSON.parse(_user.followers);
-    followers.push(me);
+    if (type === "+") {
+      followers.push(me);
+    } else {
+      let _followers = followers;
+      followers = _followers.filter((p) => p != me);
+    }
   });
 
   return followers;
@@ -38,7 +49,7 @@ const follow = (req, res) => {
   try {
     db.query(
       "UPDATE Users SET following = ? WHERE username = ?",
-      [JSON.stringify(getFollowing(me, person)), me],
+      [JSON.stringify(getFollowing(me, person, "+")), me],
       (err, results) => {
         if (err) {
           console.log(err);
@@ -46,7 +57,7 @@ const follow = (req, res) => {
 
         db.query(
           "UPDATE Users SET followers = ? WHERE username = ?",
-          [JSON.stringify(getFollowers(person, me)), person],
+          [JSON.stringify(getFollowers(person, me, "+")), person],
           (err, results1) => {
             if (err) {
               console.log(err);
@@ -68,7 +79,7 @@ const unfollow = (req, res) => {
   try {
     db.query(
       "UPDATE Users SET following = ? WHERE username = ?",
-      [JSON.stringify([...getFollowing(me).filter((p) => p != person)]), me],
+      [JSON.stringify(getFollowing(me, person, "-")), me],
       (err, results) => {
         if (err) {
           console.log(err);
@@ -77,7 +88,9 @@ const unfollow = (req, res) => {
         db.query(
           "UPDATE Users SET followers = ? WHERE username = ?",
           [
-            JSON.stringify([...getFollowers(person).filter((p) => p != me)]),
+            JSON.stringify([
+              ...getFollowers(person, me, "-").filter((p) => p != me),
+            ]),
             person,
           ],
           (err, results1) => {

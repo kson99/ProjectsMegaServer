@@ -8,7 +8,7 @@ const getFollowing = (me) => {
       console.log(err);
     }
 
-    following = JSON.parse(_user.following);
+    following = _user.following ? JSON.parse(_user.following) : [];
   });
 
   return following;
@@ -22,7 +22,7 @@ const getFollowers = (person) => {
       console.log(err);
     }
 
-    followers = JSON.parse(_user.followers);
+    followers = _user.followers ? JSON.parse(_user.followers) : [];
   });
 
   return followers;

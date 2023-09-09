@@ -1,9 +1,7 @@
 const db = require("../config/db");
 
 const upload = (req, res) => {
-  const caption = req.body.caption;
-  const image = req.body.image;
-  const username = req.body.username;
+  const { caption, image, username } = req.body;
 
   db.query(
     "INSERT INTO Uploads (caption, image, username) VALUES (?, ?, ?)",
@@ -44,8 +42,7 @@ const getUploads = (req, res) => {
 };
 
 const likeUpload = (req, res) => {
-  const userLiking = req.body.userLiking;
-  const postId = req.body.postId;
+  const { userLiking, postId } = req.body;
 
   db.query(
     "INSERT INTO Likes (userLiking, postId) VALUES (?, ?)",
@@ -69,8 +66,7 @@ const likeUpload = (req, res) => {
 };
 
 const uploadProPic = (req, res) => {
-  const image = req.body.image;
-  const username = req.body.username;
+  const { image, username } = req.body;
 
   db.query(
     "UPDATE Users SET profilePicture = ? WHERE username = ?",

@@ -2,8 +2,7 @@ const db = require("../config/db");
 const jwt = require("jsonwebtoken");
 
 const login = (req, res) => {
-  const stNumber = req.body.stNumber;
-  const password = req.body.password;
+  const { stNumber, password } = req.body;
 
   try {
     db.query(
@@ -45,16 +44,12 @@ const login = (req, res) => {
 };
 
 const register = (req, res) => {
-  const username = req.body.username;
-  const stNumber = req.body.stNumber;
-  const college = req.body.college;
-  const course = req.body.course;
-  const password = req.body.password;
-  const userId = req.body.userId;
+  const { username, stNumber, college, course, nationality, password, userId } =
+    req.body;
 
   db.query(
-    "INSERT INTO Users (username, stNumber, college, course, password, userId) VALUES (?, ?, ?, ?, ?, ?)",
-    [username, stNumber, college, course, password, userId],
+    "INSERT INTO Users (username, stNumber, college, course, nationality, password, userId) VALUES (?, ?, ?, ?, ?, ?)",
+    [username, stNumber, college, course, nationality, password, userId],
     (err, results) => {
       if (err) {
         console.log(err);
@@ -66,7 +61,7 @@ const register = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  const username = req.params.username;
+  const { username } = req.params;
 
   db.query(
     "SELECT * FROM Users WHERE username = ?",

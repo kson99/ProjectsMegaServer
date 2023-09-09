@@ -5,7 +5,7 @@ const router = express.Router();
 const { postChats, getChats } = require("./routes/chats");
 const { login, register, getUser, getUsers } = require("./routes/users");
 const { sendMessage, getMessages } = require("./routes/message");
-const { follow, getFollowers, getFollowing } = require("./routes/follows");
+const { follow, unfollow } = require("./routes/follows");
 const {
   upload,
   getUploads,
@@ -35,7 +35,6 @@ router.get("/message", getMessages);
 
 // Follows
 router.post("/follows", follow);
-router.get("/follows/followers", getFollowers);
-router.get("/follows/following", getFollowing);
+router.post("/unfollow", unfollow);
 
 module.exports = router;

@@ -1,52 +1,94 @@
 const db = require("../config/db");
 
+const getFollowing = (me) => {
+  let following;
+
+  db.query("SELECT * FROM Users WHERE username = ?", me, (err, _user) => {
+    if (err) {
+      console.log(err);
+    }
+
+    following = JSON.parse(_user.following);
+  });
+
+  return following;
+};
+
+const getFollowers = (person) => {
+  let followers;
+
+  db.query("SELECT * FROM Users WHERE username = ?", person, (err, _user) => {
+    if (err) {
+      console.log(err);
+    }
+
+    followers = JSON.parse(_user.followers);
+  });
+
+  return followers;
+};
+
 const follow = (req, res) => {
-  const follower = req.body.follower;
-  const following = req.body.following;
+  const { me, person } = req.body;
 
-  db.query(
-    "INSERT INTO Follows (follower, following) VALUES (?, ?)",
-    [follower, following],
-    (err, results) => {
-      if (err) {
-        console.log(err);
+  try {
+    db.query(
+      "UPDATE Users SET following = ? WHERE username = ?",
+      [JSON.stringify([...getFollowing(me), person]), me],
+      (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+
+        db.query(
+          "UPDATE Users SET followers = ? WHERE username = ?",
+          [JSON.stringify([...getFollowers(person), me]), person],
+          (err, results1) => {
+            if (err) {
+              console.log(err);
+            }
+
+            res.send({ results, results1 });
+          }
+        );
       }
-
-      res.send(results);
-    }
-  );
+    );
+  } catch (error) {
+    res.json({ status: "failed", message: error.message });
+  }
 };
 
-const getFollowers = (req, res) => {
-  const username = req.query.foo;
+const unfollow = (req, res) => {
+  const { me, person } = req.body;
 
-  db.query(
-    "SELECT * FROM Follows WHERE follower = ?",
-    username,
-    (err, results) => {
-      if (err) {
-        console.log(err);
+  try {
+    db.query(
+      "UPDATE Users SET following = ? WHERE username = ?",
+      [JSON.stringify([...getFollowing(me).filter((p) => p != person)]), me],
+      (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+
+        db.query(
+          "UPDATE Users SET followers = ? WHERE username = ?",
+          [
+            JSON.stringify([...getFollowers(person).filter((p) => p != me)]),
+            person,
+          ],
+          (err, results1) => {
+            if (err) {
+              console.log(err);
+            }
+
+            res.send({ results, results1 });
+          }
+        );
       }
-
-      res.send(results);
-    }
-  );
+    );
+  } catch (error) {
+    res.json({ status: "failed", message: error.message });
+  }
 };
 
-const getFollowing = (req, res) => {
-  const username = req.query.foo;
-
-  db.query(
-    "SELECT * FROM Follows WHERE following = ?",
-    username,
-    (err, results) => {
-      if (err) {
-        console.log(err);
-      }
-
-      res.send(results);
-    }
-  );
-};
-
-module.exports = { follow, getFollowers, getFollowing };
+module.exports = { follow, unfollow };

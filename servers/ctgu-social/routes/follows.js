@@ -1,14 +1,16 @@
 const db = require("../config/db");
 
-const getFollowing = (me, person, type) => {
+const getFollowing = async (me, person, type) => {
   let following = [];
 
-  db.query("SELECT * FROM Users WHERE username = ?", me, (err, _user) => {
+  await db.query("SELECT * FROM Users WHERE username = ?", me, (err, _user) => {
     if (err) {
       console.log(err);
     }
 
-    following = _user.following != null && JSON.parse(_user.following);
+    if (_user.following != null) {
+      following.push(...JSON.parse(_user.following));
+    }
 
     if (type === "+") {
       following.push(person);
@@ -21,28 +23,32 @@ const getFollowing = (me, person, type) => {
   return following;
 };
 
-const getFollowers = (person, me, type) => {
+const getFollowers = async (person, me, type) => {
   let followers = [];
 
-  db.query("SELECT * FROM Users WHERE username = ?", person, (err, _user) => {
-    if (err) {
-      console.log(err);
-    }
+  await db.query(
+    "SELECT * FROM Users WHERE username = ?",
+    person,
+    (err, _user) => {
+      if (err) {
+        console.log(err);
+      }
+      let f = _user.followers != null && JSON.parse(_user.followers);
+      followers.push(...f);
 
-    followers = _user.followers != null && JSON.parse(_user.followers);
-
-    if (type === "+") {
-      followers.push(me);
-    } else {
-      let _followers = followers;
-      followers = _followers.filter((p) => p != me);
+      if (type === "+") {
+        followers.push(me);
+      } else {
+        let _followers = followers;
+        followers = _followers.filter((p) => p != me);
+      }
     }
-  });
+  );
 
   return followers;
 };
 
-const follow = (req, res) => {
+const follow = async (req, res) => {
   const { me, person } = req.body;
 
   try {
@@ -72,7 +78,7 @@ const follow = (req, res) => {
   }
 };
 
-const unfollow = (req, res) => {
+const unfollow = async (req, res) => {
   const { me, person } = req.body;
 
   try {

@@ -33,8 +33,10 @@ const getFollowers = async (person, me, type) => {
       if (err) {
         console.log(err);
       }
-      let f = _user.followers != null && JSON.parse(_user.followers);
-      followers.push(...f);
+
+      if (_user.followers != null) {
+        followers.push(JSON.parse(_user.followers));
+      }
 
       if (type === "+") {
         followers.push(me);

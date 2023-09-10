@@ -11,6 +11,7 @@ const {
   getUploads,
   likeUpload,
   uploadProPic,
+  deletePost,
 } = require("./routes/upload");
 
 // Users
@@ -28,6 +29,7 @@ router.post("/upload", upload);
 router.get("/upload", getUploads);
 router.post("/upload/like", likeUpload);
 router.post("/upload/proPic", uploadProPic);
+router.post("/upload/delete", deletePost);
 
 // Messages
 router.post("/message", sendMessage);

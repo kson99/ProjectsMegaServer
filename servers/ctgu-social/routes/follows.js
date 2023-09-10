@@ -3,39 +3,39 @@ const db = require("../config/db");
 const getFollowing = async (me, person, type) => {
   let following = [];
 
-  await db.query("SELECT * FROM Users WHERE username = ?", me, (err, _user) => {
-    if (err) {
-      console.log(err);
-    }
+  return new Promise((resolve, reject) =>
+    db.query("SELECT * FROM Users WHERE username = ?", me, (err, _user) => {
+      if (err) {
+        console.log(err);
+      }
 
-    if (_user.following != null) {
-      following.push(...JSON.parse(_user.following));
-    }
+      if (_user[0].following) {
+        following.push(...JSON.parse(_user[0].following));
+      }
 
-    if (type === "+") {
-      following.push(person);
-    } else {
-      let _following = following;
-      following = _following.filter((p) => p != person);
-    }
-  });
+      if (type === "+") {
+        following.push(person);
+      } else {
+        let _following = following;
+        following = _following.filter((p) => p != person);
+      }
 
-  return following;
+      resolve(following);
+    })
+  );
 };
 
 const getFollowers = async (person, me, type) => {
   let followers = [];
 
-  await db.query(
-    "SELECT * FROM Users WHERE username = ?",
-    person,
-    (err, _user) => {
+  return new Promise((resolve, reject) =>
+    db.query("SELECT * FROM Users WHERE username = ?", person, (err, _user) => {
       if (err) {
         console.log(err);
       }
 
-      if (_user.followers != null) {
-        followers.push(JSON.parse(_user.followers));
+      if (_user[0].followers) {
+        followers.push(...JSON.parse(_user[0].followers));
       }
 
       if (type === "+") {
@@ -44,10 +44,10 @@ const getFollowers = async (person, me, type) => {
         let _followers = followers;
         followers = _followers.filter((p) => p != me);
       }
-    }
-  );
 
-  return followers;
+      resolve(followers);
+    })
+  );
 };
 
 const follow = async (req, res) => {
@@ -56,15 +56,15 @@ const follow = async (req, res) => {
   try {
     db.query(
       "UPDATE Users SET following = ? WHERE username = ?",
-      [JSON.stringify(getFollowing(me, person, "+")), me],
-      (err, results) => {
+      [JSON.stringify(await getFollowing(me, person, "+")), me],
+      async (err, results) => {
         if (err) {
           console.log(err);
         }
 
         db.query(
           "UPDATE Users SET followers = ? WHERE username = ?",
-          [JSON.stringify(getFollowers(person, me, "+")), person],
+          [JSON.stringify(await getFollowers(person, me, "+")), person],
           (err, results1) => {
             if (err) {
               console.log(err);
@@ -86,15 +86,15 @@ const unfollow = async (req, res) => {
   try {
     db.query(
       "UPDATE Users SET following = ? WHERE username = ?",
-      [JSON.stringify(getFollowing(me, person, "-")), me],
-      (err, results) => {
+      [JSON.stringify(await getFollowing(me, person, "-")), me],
+      async (err, results) => {
         if (err) {
           console.log(err);
         }
 
         db.query(
           "UPDATE Users SET followers = ? WHERE username = ?",
-          [JSON.stringify(getFollowers(person, me, "-")), person],
+          [JSON.stringify(await getFollowers(person, me, "-")), person],
           (err, results1) => {
             if (err) {
               console.log(err);

@@ -49,27 +49,104 @@ const getUploads = (req, res) => {
   }
 };
 
-const likeUpload = (req, res) => {
-  const { userLiking, postId } = req.body;
+const getLikes = async (person, id, type) => {
+  let likes = [];
+
+  return new Promise((resolve, reject) =>
+    db.query("SELECT * FROM Uploads WHERE id = ?", id, (err, post) => {
+      if (err) {
+        console.log(err);
+      }
+
+      if (post[0].likes) {
+        likes.push(...eval(post[0].likes));
+      }
+
+      if (type === "+") {
+        likes.push(person);
+      } else {
+        let _likes = likes;
+        likes = _likes.filter((p) => p != person);
+      }
+
+      resolve(likes);
+    })
+  );
+};
+
+const likeUpload = async (req, res) => {
+  const { person, postId } = req.body;
 
   try {
     db.query(
-      "INSERT INTO Likes (userLiking, postId) VALUES (?, ?)",
-      [userLiking, postId],
-      (err, results) => {
+      "UPDATE Uploads SET likes = ? WHERE id = ?",
+      [JSON.stringify(await getLikes(person, postId, "+")), postId],
+      (err, result) => {
         if (err) {
-          console.log(err);
+          res.send(err);
         }
 
-        if (results !== undefined || results !== null) {
-          db.query(
-            "UPDATE Uploads SET likesNo = likesNo + 1 WHERE id = ?",
-            postId,
-            (err2, results2) => {
-              res.send(results2);
-            }
-          );
+        res.send(result);
+      }
+    );
+  } catch (error) {
+    res.json({ status: "failed", message: error.message });
+  }
+};
+
+const unlikeUpload = async (req, res) => {
+  const { person, postId } = req.body;
+
+  try {
+    db.query(
+      "UPDATE Uploads SET likes = ? WHERE id = ?",
+      [JSON.stringify(await getLikes(person, postId, "-")), postId],
+      (err, result) => {
+        if (err) {
+          res.send(err);
         }
+
+        res.send(result);
+      }
+    );
+  } catch (error) {
+    res.json({ status: "failed", message: error.message });
+  }
+};
+
+const getComments = (person, comment, id) => {
+  let comments = [];
+
+  return new Promise((resolve, reject) => {
+    db.query("SELECT * FROM Uploads WHERE id = ?", id, (err, post) => {
+      if (err) {
+        console.log(err);
+      }
+
+      if (post[0].comments) {
+        comments.push(...eval(post[0].comments));
+      }
+
+      comments.push({ username: person, comment: comment });
+
+      resolve(comments);
+    });
+  });
+};
+
+const comment = async (req, res) => {
+  const { person, comment, postId } = req.body;
+
+  try {
+    db.query(
+      "UPDATE Uploads SET comments = ? WHERE id = ?",
+      [JSON.stringify(await getComments(person, comment, postId)), postId],
+      (err, result) => {
+        if (err) {
+          res.send(err);
+        }
+
+        res.send(result);
       }
     );
   } catch (error) {
@@ -123,4 +200,12 @@ const deletePost = (req, res) => {
   }
 };
 
-module.exports = { upload, getUploads, likeUpload, uploadProPic, deletePost };
+module.exports = {
+  upload,
+  getUploads,
+  likeUpload,
+  unlikeUpload,
+  comment,
+  uploadProPic,
+  deletePost,
+};

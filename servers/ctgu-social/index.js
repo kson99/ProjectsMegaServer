@@ -10,6 +10,8 @@ const {
   upload,
   getUploads,
   likeUpload,
+  unlikeUpload,
+  comment,
   uploadProPic,
   deletePost,
 } = require("./routes/upload");
@@ -28,8 +30,10 @@ router.get("/chat", getChats);
 router.post("/upload", upload);
 router.get("/upload", getUploads);
 router.post("/upload/like", likeUpload);
+router.post("/upload/unlike", unlikeUpload);
 router.post("/upload/proPic", uploadProPic);
 router.post("/upload/delete", deletePost);
+router.post("/upload/comment", comment);
 
 // Messages
 router.post("/message", sendMessage);

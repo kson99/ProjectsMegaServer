@@ -22,17 +22,19 @@ const signUp = (req, res) => {
   );
 };
 
-// get user information with userUid
-const getUser = (req, res) => {
-  const userUid = req.params.uid;
+// get users
+const getUsers = (req, res) => {
+  try {
+    db.query("SELECT * FROM Users", (err, users) => {
+      if (err) {
+        console.error("Error exec MySQL query: ", err);
+      }
 
-  db.query("SELECT * FROM Users WHERE userUid = ?", userUid, (err, result) => {
-    if (err) {
-      console.error("Error exec MySQL query: ", err);
-    }
-
-    res.json(result);
-  });
+      res.send(users);
+    });
+  } catch (error) {
+    res.send({ status: "failed", error: error });
+  }
 };
 
 // Update specific user information
@@ -60,4 +62,4 @@ const updateUser = (req, res) => {
   );
 };
 
-module.exports = { signUp, getUser, updateUser };
+module.exports = { signUp, getUsers, updateUser };

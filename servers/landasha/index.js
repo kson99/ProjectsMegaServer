@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Getting routes
-const { signUp, getUser, updateUser } = require("./routes/users");
+const { signUp, getUsers, updateUser } = require("./routes/users");
 const {
   getItems,
   uploadItem,
@@ -18,7 +18,7 @@ const {
 // Users
 router.post("/Users/signUp", signUp);
 router.post("/Users/update", updateUser);
-router.get("/Users/:uid", getUser);
+router.get("/Users", getUsers);
 
 // Items
 router.get("/Items", getItems);

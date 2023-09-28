@@ -1,25 +1,45 @@
 const db = require("../config/db");
 
+// register / Signup
 const signUp = (req, res) => {
-  const entries = req.body.formEntries;
+  const { userUid, imageUrl, username, shopName, location, phoneNo } = req.body;
 
-  db.query(
-    "INSERT INTO Users (userUid, imageUrl, username, location, phoneNo) VALUES (?, ?, ?, ?, ?)",
-    [
-      entries.userUid,
-      entries.imageUrl,
-      entries.username,
-      entries.location,
-      entries.phoneNo,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error("Error exec MySQL query: ", err);
+  try {
+    db.query(
+      "INSERT INTO Users (userUid, imageUrl, username, shopName, location, phoneNo) VALUES (?, ?, ?, ?, ?, ?)",
+      [userUid, imageUrl, username, shopName, location, phoneNo],
+      (err, result) => {
+        if (err) {
+          console.error("Error exec MySQL query: ", err);
+        }
+
+        res.json(result);
       }
+    );
+  } catch (error) {
+    res.send({ status: "failed", error: error });
+  }
+};
 
-      res.json(result);
-    }
-  );
+// Update user imageUrl
+const updateImageUrl = (req, res) => {
+  const { imageUrl, userUid } = req.body;
+
+  try {
+    db.query(
+      "UPDATE Users SET ? Where userUid = ?",
+      [{ imageUrl }, userUid],
+      (err, result) => {
+        if (err) {
+          console.error("Error exec MySQL query: ", err);
+        }
+
+        res.json(result);
+      }
+    );
+  } catch (error) {
+    res.send({ status: "failed", error: error });
+  }
 };
 
 // get users
@@ -39,27 +59,32 @@ const getUsers = (req, res) => {
 
 // Update specific user information
 const updateUser = (req, res) => {
-  const data = req.body.userData;
+  const { username, imageUrl, phoneNo, location, shopName, userUid } = req.body;
 
-  db.query(
-    `UPDATE Users SET ? WHERE userUid = ?`,
-    [
-      {
-        username: data.username,
-        imageUrl: data.imageUrl,
-        phoneNo: data.phoneNo,
-        location: data.location,
-      },
-      data.userUid,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error("Error exec MySQL query: ", err);
+  try {
+    db.query(
+      "UPDATE Users SET ? WHERE userUid = ?",
+      [
+        {
+          username,
+          imageUrl,
+          phoneNo,
+          location,
+          shopName,
+        },
+        userUid,
+      ],
+      (err, result) => {
+        if (err) {
+          console.error("Error exec MySQL query: ", err);
+        }
+
+        res.json(result);
       }
-
-      res.json(result);
-    }
-  );
+    );
+  } catch (error) {
+    res.send({ status: "failed", error: error });
+  }
 };
 
-module.exports = { signUp, getUsers, updateUser };
+module.exports = { signUp, getUsers, updateUser, updateImageUrl };

@@ -2,12 +2,12 @@ const db = require("../config/db");
 
 // register / Signup
 const signUp = (req, res) => {
-  const { userUid, imageUrl, username, shopName, location, phoneNo } = req.body;
+  const { userUid, username, shopName, location, phoneNo } = req.body;
 
   try {
     db.query(
-      "INSERT INTO Users (userUid, imageUrl, username, shopName, location, phoneNo) VALUES (?, ?, ?, ?, ?, ?)",
-      [userUid, imageUrl, username, shopName, location, phoneNo],
+      "INSERT INTO Users (userUid, username, shopName, location, phoneNo) VALUES (?, ?, ?, ?, ?)",
+      [userUid, username, shopName, location, phoneNo],
       (err, result) => {
         if (err) {
           console.error("Error exec MySQL query: ", err);

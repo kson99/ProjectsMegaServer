@@ -27,7 +27,7 @@ const updateImageUrl = (req, res) => {
 
   try {
     db.query(
-      "UPDATE Users SET ? Where userUid = ?",
+      "UPDATE Users SET ? WHERE userUid = ?",
       [{ imageUrl }, userUid],
       (err, result) => {
         if (err) {

@@ -13,21 +13,13 @@ const getItems = (req, res) => {
 
 //Uploading a new item
 const uploadItem = (req, res) => {
-  const data = req.body.itemData;
+  const { name, category, images, description, price, owner, itemId } =
+    req.body;
   const timestamp = Date.now();
 
   db.query(
-    "INSERT INTO Items (category, description, imageUrl, itemId, name, owner, price, timestamp) VALUES (?, ?, ?, ? ,? , ? , ?, ?)",
-    [
-      data.category,
-      data.description,
-      data.imageUrl,
-      data.itemId,
-      data.name,
-      data.owner,
-      data.price,
-      timestamp,
-    ],
+    "INSERT INTO Items (category, description, images, itemId, name, owner, price, timestamp) VALUES (?, ?, ?, ? ,? , ? , ?, ?)",
+    [category, description, images, itemId, name, owner, price, timestamp],
     (err, results) => {
       if (err) {
         console.error("Error exec MySQL query: ", err);

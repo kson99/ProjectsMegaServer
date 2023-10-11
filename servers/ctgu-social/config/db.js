@@ -10,11 +10,11 @@ const db = mysql.createPool({
 
 db.getConnection((err, connection) => {
   if (err) {
-    console.log("Error connecting to MySQL database", err);
+    console.log("Error connecting to CTGU-SOCIAL DB", err);
     return;
   }
 
-  console.log("Connected to MySQL database!");
+  console.log("Connected to CTGU-SOCIAL DB!");
 
   //release connection
   connection.release();

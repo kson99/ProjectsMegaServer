@@ -17,14 +17,14 @@ const getItems = (req, res) => {
 
 //Uploading a new item
 const uploadItem = (req, res) => {
-  const { name, category, images, description, price, owner, itemId } =
+  const { name, category, subCategory, images, description, price, owner, itemId } =
     req.body;
   const timestamp = Date.now();
 
   try {
     db.query(
-      "INSERT INTO Items (category, description, images, itemId, name, owner, price, timestamp) VALUES (?, ?, ?, ? ,? , ? , ?, ?)",
-      [category, description, images, itemId, name, owner, price, timestamp],
+      "INSERT INTO Items (category, subCategory, description, images, itemId, name, owner, price, timestamp) VALUES (?, ?, ?, ?, ? ,? , ? , ?, ?)",
+      [category, subCategory, description, images, itemId, name, owner, price, timestamp],
       (err, results) => {
         if (err) {
           console.error("Error exec MySQL query: ", err);
@@ -57,7 +57,7 @@ const deleteItem = (req, res) => {
 
 // Updating elements of an item in th colloction
 const updateItem = (req, res) => {
-  const { name, price, images, description, itemId, category } = req.body;
+  const { name, price, images, description, itemId, category, subCategory } = req.body;
 
   try {
     db.query(
@@ -69,6 +69,7 @@ const updateItem = (req, res) => {
           images,
           description,
           category,
+          subCategory
         },
         itemId,
       ],
